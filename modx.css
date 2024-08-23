@@ -1,0 +1,364 @@
+@charset "UTF-8";
+/*
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * ModX implementation : © LoonTonk aidanyliu@hotmail.com
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+#mdx_board {
+  width: 522px;
+  height: 522px;
+  background-image: url("img/modx_board.png");
+  margin: auto;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  position: relative;
+}
+
+.show_notation #board {
+  margin-bottom: 40px;
+}
+
+.coordinate_marker {
+  width: auto;
+  height: auto;
+  position: absolute;
+  z-index: 50;
+  pointer-events: none;
+  font-size: 16pt;
+}
+
+.hide_notation .coordinate_marker {
+  display: none;
+}
+
+.square {
+  width: 62px;
+  height: 62px;
+  position: absolute;
+  z-index: 0;
+}
+
+.scoretile {
+  top: 0px;
+  left: 0px;
+  width: 62px;
+  height: 62px;
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tilecolor_009bd2 {
+  background-color: #0077a3;
+}
+
+.tilecolor_e53f2c {
+  background-color: #b23223;
+}
+
+.tilecolor_050303 {
+  background-color: #414141;
+}
+
+.tilecolor_ffc750 {
+  background-color: #d9a03e;
+}
+
+.token {
+  width: 56px;
+  height: 56px;
+  position: absolute;
+  z-index: 4;
+  background-image: url("img/modx_tokens.png");
+  transform: scale(0.9);
+}
+
+.tokencolor_0 {
+  background-position: 0px 0px;
+  animation: pulse 1s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.instant_win {
+  animation: instant_win_animation 2s ease-in-out infinite;
+}
+
+@keyframes instant_win_animation {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.5); /* Increase size */
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+.tokencolor_009bd2 {
+  background-position: -56px 0px;
+}
+
+.tokencolor_e53f2c {
+  background-position: -112px 0px;
+}
+
+.tokencolor_050303 {
+  background-position: -168px 0px;
+}
+
+.tokencolor_ffc750 {
+  background-position: -224px 0px;
+}
+
+.token_outline {
+  background-position: -280px 0px;
+  z-index: 3;
+}
+
+.hide_lastPlayed .lastPlayed {
+  display: none;
+}
+
+.lastPlayed {
+  pointer-events: none;
+  width: 45px;
+  height: 45px;
+  transform: scale(0.9);
+  position: absolute;
+  background-image: url("img/modx_last_played.png");
+}
+
+.lastPlayedcolor_009bd2 {
+  background-position: 0px 0px;
+}
+
+.lastPlayedcolor_e53f2c {
+  background-position: -45px 0px;
+}
+
+.lastPlayedcolor_050303 {
+  background-position: -90px 0px;
+}
+
+.lastPlayedcolor_ffc750 {
+  background-position: -135px 0px;
+}
+
+.selectable.tokencolor_0 {
+  animation: selectable-token-animation 1s ease-in-out infinite alternate-reverse;
+  z-index: 5;
+}
+
+@keyframes selectable-token-animation {
+  0% {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+.tokencolor_0.selectable.selected {
+  animation: none;
+  background-image: none;
+}
+
+.selected::before {
+  content: "";
+  background-image: url("img/modx_selected_wild.png");
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+}
+
+.pattern {
+  position: absolute;
+  background-image: url("img/modx_patterns.png");
+  z-index: 2;
+  pointer-events: none; /* Allows clicks to pass through */
+  opacity: 0.8;
+  background-position: var(--x-pos, 0px) var(--y-pos, 0px);
+  transition: opacity 1s ease-in-out;
+}
+
+.patterncolor_009bd2 {
+  --y-pos: 0px;
+}
+
+.patterncolor_e53f2c {
+  --y-pos: -330px;
+}
+
+.patterncolor_050303 {
+  --y-pos: -660px;
+}
+
+.patterncolor_ffc750 {
+  --y-pos: -990px;
+}
+
+.patterntype_row, .patterntype_col {
+  height: 330px;
+  width: 74px;
+}
+
+.patterntype_row, .patterntype_ned {
+  transform: rotate(90deg);
+}
+
+.patterntype_pls, .patterntype_crs {
+  height: 202px;
+  width: 202px;
+}
+
+.patterntype_crs {
+  --x-pos: -74px;
+}
+
+.patterntype_pls {
+  --x-pos: -276px;
+}
+
+.patterntype_nwd, .patterntype_ned {
+  --x-pos: -478px;
+  height: 330px;
+  width: 330px;
+}
+
+.flash {
+  animation: flash 2s ease-in-out;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+.fade-out {
+  animation: fadeOut 2s forwards;
+}
+
+.possibleMove {
+  background-color: rgb(255, 255, 255);
+  cursor: pointer;
+}
+
+.square.possibleMove::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1); /* Subtle darkening */
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10; /* Ensure it's on top */
+}
+
+.square.possibleMove:hover::before {
+  opacity: 1; /* Show on hover */
+}
+
+.playertokens {
+  display: flex;
+  justify-content: flex-start; /* or other values like center, space-around, etc. */
+  align-items: center; /* Aligns items vertically */
+  margin-right: 20px;
+}
+
+.displayToken {
+  position: relative;
+  scale: 0.8;
+}
+
+.counter {
+  font-size: 24pt;
+}
+
+.player_board {
+  display: flex;
+  justify-content: flex-start; /* or other values like center, space-around, etc. */
+  align-items: center; /* Aligns items vertically */
+}
+
+.team {
+  width: 30px;
+  height: 50px;
+  background-image: url("img/modx_team_icons.png");
+}
+
+.team_0 {
+  display: none;
+}
+
+.team_1 {
+  background-position: 0px 0px;
+}
+
+.team_2 {
+  background-position: 30px 0px;
+}
+
+/*
+	This is the CSS stylesheet of your game User Interface.
+
+	Styles defined on this file will be applied to the HTML elements you define in your
+	HTML template (*.tpl), and to HTML elements you create dynamically (in modx.js).
+
+	Usually, you are using CSS to:
+
+	1°) define the overall layout of your game (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
+
+	2°) create your CSS-sprites: All images of your games should be gathered into a small number of image files. Then, using background-image and background-position CSS properties, you create HTML blocks that can  display these images correctly (see example below).
+
+	3°) ... anything else: It is really easy to add and remove CSS classes dynamically from your Javascript with dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why, very often, using CSS classes for the logic of your user interface allow you to do complex thing easily.
+*/
+/*
+	Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
+
+	.white_token {
+		background-image: url('img/tokens.png');
+		background-position: 0px 0px;
+	}
+	.black_token {
+		background-image: url('img/tokens.png');
+		background-position: -20px 0px;
+	}
+	.token {
+		width: 20px;
+		height: 20px;
+		background-repeat: none;
+	}
+*/
