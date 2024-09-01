@@ -11,6 +11,7 @@
 
 import Gamegui = require('ebg/core/gamegui');
 import "ebg/counter";
+import ready = require("dojo/ready");
 
 declare class Counter {
 	speed: number; // duration of the animation, default is 100ms
@@ -32,13 +33,11 @@ class ModX extends Gamegui
 	/** @gameSpecific See {@link Gamegui} for more information. */
 	constructor(){
 		super();
-		console.log('modx constructor');
 	}
 
 	/** @gameSpecific See {@link Gamegui.setup} for more information. */
 	override setup(gamedatas: Gamedatas): void
 	{
-		console.log( "Starting game setup" );
 		
 		// Setting up player boards, specifically counter for tokens left and teams (if applicable)
 		for( var player_id in gamedatas.players ) {
@@ -65,36 +64,34 @@ class ModX extends Gamegui
 				counter.create('remainingTokens_'+player_id);
 				const tokensLeft = gamedatas.tokensLeft[parseInt(player_id)];
 				if (tokensLeft === undefined) {
-					console.log("tokensLeft is undefined, player id is: ");
-					console.log(player_id);
 					throw new Error();
 				}
 				counter.setValue(parseInt(tokensLeft));
 				this.remainingTokensCounter[player_id] = counter;
 				this.addTooltip(`playertoken_${player_id}`, _('X-pieces remaining'), '');
 		}
-
-		// Place the tokens on the board
-		for( let i in gamedatas.board )
-			{
-				let square = gamedatas.board[i];
-		
-				if( square !== undefined && square.player != -1 ) { // If square is defined and has a player
-					this.addTokenOnBoard( square.x, square.y, square.player, square.selectable == 1); //Adds wild token if player id is 1-5
+		ready(() => {
+			// Place the tokens on the board
+			for( let i in gamedatas.board )
+				{
+					let square = gamedatas.board[i];
+			
+					if( square !== undefined && square.player != -1 ) { // If square is defined and has a player
+						this.addTokenOnBoard( square.x, square.y, square.player, square.selectable == 1); //Adds wild token if player id is 1-5
+					}
+					if (square !== undefined && square.player_tile != -1) {
+						this.addTileOnBoard(square.x, square.y, square.player_tile);
+					}
+					if (square !== undefined && square.lastPlayed > 1) {
+						this.addLastPlayedToBoard(square.x, square.y, square.lastPlayed);
+					}
 				}
-				if (square !== undefined && square.player_tile != -1) {
-					this.addTileOnBoard(square.x, square.y, square.player_tile);
-				}
-				if (square !== undefined && square.lastPlayed > 1) {
-					this.addLastPlayedToBoard(square.x, square.y, square.lastPlayed);
-				}
-			}
-		dojo.query( '.square' ).connect( 'onclick', this, 'onsquareClick' );
+			dojo.query( '.mdx_square' ).connect( 'onclick', this, 'onsquareClick' );
+		});
 		
 		// Setup game notifications to handle (see "setupNotifications" method below)
 		this.setupNotifications(); // <-- Keep this line
 
-		console.log( "Ending game setup" );
 	}
 
 	///////////////////////////////////////////////////
@@ -103,8 +100,6 @@ class ModX extends Gamegui
 	/** @gameSpecific See {@link Gamegui.onEnteringState} for more information. */
 	override onEnteringState(stateName: GameStateName, args: CurrentStateArgs): void
 	{
-		console.log( 'Entering state: '+stateName );
-		
 		switch( stateName )
 		{
 		case 'wildPlacement':
@@ -134,8 +129,7 @@ class ModX extends Gamegui
 
 	/** @gameSpecific See {@link Gamegui.onUpdateActionButtons} for more information. */
 	override onUpdateActionButtons(stateName: GameStateName, args: AnyGameStateArgs | null): void
-	{
-		console.log( 'onUpdateActionButtons: ' + stateName, args );                   
+	{               
 		if (this.isCurrentPlayerActive()) {            
 			switch( stateName ) {
 				case 'repositionWilds':
@@ -148,21 +142,21 @@ class ModX extends Gamegui
 	//// Utility methods
 	
 	clearPatterns() {
-		document.querySelectorAll('.pattern').forEach(element => {
+		document.querySelectorAll('.mdx_pattern').forEach(element => {
 			dojo.destroy(element);
 		});
 	}
 
 	clearSelectedToken() {
 		// Remove selected tag from any previous tokens
-		document.querySelectorAll('.selected').forEach(element => {
-			element.classList.remove('selected');
+		document.querySelectorAll('.mdx_selected').forEach(element => {
+			element.classList.remove('mdx_selected');
 		});
 	}
 
 	/** Removes the 'selectable' and 'selected' class from all elements. */
 	clearSelectableFromAll() {
-		document.querySelectorAll('.selectable').forEach(element => {
+		document.querySelectorAll('.mdx_selectable').forEach(element => {
 			const [_token_, x, y] = element.id.split('_');
 			if (x === undefined || y === undefined) {
 				throw new Error("When trying to get x and y from id of selectable token it was undefined");
@@ -173,28 +167,28 @@ class ModX extends Gamegui
 	/** Removes the 'selectable' class from one element and changes the tooltip */
 	removeSelectable(x: number, y: number) {
 		var selectable_token = $(`token_${x}_${y}`);
-		selectable_token?.classList.remove('selectable');
-		selectable_token?.classList.remove('selected');
+		selectable_token?.classList.remove('mdx_selectable');
+		selectable_token?.classList.remove('mdx_selected');
 		this.addTooltip(`token_${x}_${y}`, _('This is a Wild X-piece'), '');
 	}
 
 	/** Removes the 'possibleMove' class from all elements. */
 	clearPossibleMoves() {
-		document.querySelectorAll('.possibleMove').forEach(element => {
+		document.querySelectorAll('.mdx_possibleMove').forEach(element => {
 			this.removeTooltip(element.id);
-			element.classList.remove('possibleMove');
+			element.classList.remove('mdx_possibleMove');
 		});
 	}
 
 	clearLastPlayed() {
-		document.querySelectorAll('.lastPlayed').forEach(element => {
+		document.querySelectorAll('.mdx_lastPlayed').forEach(element => {
 			dojo.destroy(element);
 		});
 	}
 
 	addLastPlayedToBoard(x: number, y: number, lastPlayed: number) {
 		const color = this.gamedatas.players[lastPlayed]!.color;
-		document.querySelectorAll(`.lastPlayedcolor_${color}`).forEach(element => {
+		document.querySelectorAll(`.mdx_lastPlayedcolor_${color}`).forEach(element => {
 			dojo.destroy(element);
 		});
 		dojo.place( this.format_block( 'jstpl_lastPlayed', {
@@ -217,7 +211,7 @@ class ModX extends Gamegui
 	}
 
 	clearTokenOutline() {
-		document.querySelectorAll('.token_outline').forEach(element => {
+		document.querySelectorAll('.mdx_token_outline').forEach(element => {
 			dojo.destroy(element);
 		});
 	}
@@ -227,7 +221,7 @@ class ModX extends Gamegui
 		if (selectable_token === null) {
 			throw new Error("when trying to get selectable token it was null");
 		}
-		selectable_token.classList.add('selectable');
+		selectable_token.classList.add('mdx_selectable');
 		// Change tooltip
 		this.addTooltip(`token_${x}_${y}`, '', _('Select this Wild to reposition it'));
 	}
@@ -243,18 +237,18 @@ class ModX extends Gamegui
 				let square = $(`square_${x}_${y}`);
 				if( !square )
 					throw new Error( `Unknown square element: ${x}_${y}. Make sure the board grid was set up correctly in the tpl file.` );
-				square.classList.add('possibleMove');
+				square.classList.add('mdx_possibleMove');
 			}
 		}
 		switch(gameState) {
 			case ('wildPlacement'):
-				this.addTooltipToClass( 'possibleMove', '', _('Place a Wild here') );
+				this.addTooltipToClass( 'mdx_possibleMove', '', _('Place a Wild here') );
 				break;
 			case ('playerTurn'):
-				this.addTooltipToClass( 'possibleMove', '', _('Place your X-piece here') );
+				this.addTooltipToClass( 'mdx_possibleMove', '', _('Place your X-piece here') );
 				break;
 			case ('moveWild'):
-				this.addTooltipToClass( 'possibleMove', '', _('Move the selected Wild here') );
+				this.addTooltipToClass( 'mdx_possibleMove', '', _('Move the selected Wild here') );
 				break;
 			case ('repositionWild'):
 				break;
@@ -271,10 +265,10 @@ class ModX extends Gamegui
 				color: 0,
 				x_y: `${x}_${y}`
 			} ) , 'board' );
-			$(`token_${x}_${y}`)?.classList.add(`wild_${player_id}`);
-			console.log(document.getElementById(`token_${x}_${y}`));
-			console.log(`square_${x}_${y}`);
-			player_id = this.getCurrentPlayerId();
+			$(`token_${x}_${y}`)?.classList.add(`mdx_wild_${player_id}`);
+			if (!this.isSpectator) {
+				player_id = this.getCurrentPlayerId();
+			}
 			this.addTooltip( `token_${x}_${y}`, _('This is a Wild X-piece'), '');
 		} else { // it's a player token
 			let player = this.gamedatas.players[ player_id ];
@@ -294,8 +288,12 @@ class ModX extends Gamegui
 		if (selectable) {
 			this.markSelectableToken(x,y);
 		}
-		this.placeOnObject( `token_${x}_${y}`, `overall_player_board_${player_id}` );
-		this.slideToObject( `token_${x}_${y}`, `square_${x}_${y}` ).play();
+		if (player_id > ModX.MAX_WILDS) {
+			this.placeOnObject( `token_${x}_${y}`, `overall_player_board_${player_id}` );
+			this.slideToObject( `token_${x}_${y}`, `square_${x}_${y}` ).play();
+		} else {
+			this.placeOnObject( `token_${x}_${y}`, `square_${x}_${y}` );
+		}
 	}
 
 	/** Adds a tile matching the given player to the board at the specified location. */
@@ -307,7 +305,7 @@ class ModX extends Gamegui
 		}
 		const scoretile = $<HTMLElement>( `scoretile_${x}_${y}` );
 		if (scoretile !== null) { // there is already a score tile here, should remove it at the end
-			scoretile.classList.add('toDestroy');
+			scoretile.classList.add('mdx_toDestroy');
 			scoretile.id += '_toDestroy'; // change the id so we don't have multiple elements with the same id
 		}
 		dojo.place( this.format_block( 'jstpl_scoretile', {
@@ -318,7 +316,7 @@ class ModX extends Gamegui
 		var animation_id = this.slideToObject( `scoretile_${x}_${y}`, `square_${x}_${y}` );
 		dojo.connect(animation_id, 'onEnd', () => {
 			// After the animation, clear all scoretiles with .toDestroy class
-			document.querySelectorAll('.toDestroy').forEach(element => {
+			document.querySelectorAll('.mdx_toDestroy').forEach(element => {
 				dojo.destroy(element);
 			});
 			const curr_scoretile = $<HTMLElement>( `scoretile_${x}_${y}` );
@@ -332,7 +330,6 @@ class ModX extends Gamegui
 	}
 
 	addPatternOnBoard(pattern: string, x: number, y: number, player_id: string) {
-		console.log(`Adding pattern at position (${x}, ${y}):`, pattern);
 		const player = this.gamedatas.players[ parseInt(player_id) ];
 		if (!player) {
 			throw new Error( 'Unknown player id: ' + player_id );
@@ -359,8 +356,7 @@ class ModX extends Gamegui
 						x_pos += -2;
 						break;
 					default:
-						console.log("row pattern code does not match");
-						return;
+						throw new Error("row pattern code does not match");
 				}
 				break;
 			case ('col'):
@@ -381,8 +377,7 @@ class ModX extends Gamegui
 						y_pos += -2;
 						break;
 					default:
-						console.log("col pattern code does not match");
-						return;
+						throw new Error("col pattern code does not match");
 				}
 				break;
 			case ('nwd'):
@@ -408,8 +403,7 @@ class ModX extends Gamegui
 						y_pos += -2;
 						break;
 					default:
-						console.log("nwd pattern code does not match");
-						return;
+						throw new Error("nwd pattern code does not match");
 				}
 				break;
 			case ('ned'):
@@ -435,8 +429,7 @@ class ModX extends Gamegui
 						y_pos += -2;
 						break;
 					default:
-						console.log("ned pattern code does not match");
-						return;
+						throw new Error("ned pattern code does not match");
 				}
 				break;
 			case ('pls'):
@@ -462,8 +455,7 @@ class ModX extends Gamegui
 						y_pos += -1;
 						break;
 					default:
-						console.log("pls pattern code does not match");
-						return;
+						throw new Error("pls pattern code does not match");
 				}
 				break;
 			case ('crs'):
@@ -489,13 +481,11 @@ class ModX extends Gamegui
 						y_pos += -1;
 						break;
 					default:
-						console.log("crs pattern code does not match");
-						return;
+						throw new Error("crs pattern code does not match");
 				}
 				break;
 			default:
-				console.log("pattern code does not match");
-				return;
+				throw new Error("pattern code does not match");
 		}
 
 		dojo.place( this.format_block( 'jstpl_pattern', {
@@ -505,13 +495,13 @@ class ModX extends Gamegui
 		} ) , `board` );
 		const patternElement = <HTMLElement>$(`pattern_${x_pos}_${y_pos}_${patternType}`);
 		this.placeOnObject( patternElement, `square_${x_pos}_${y_pos}` );
-		patternElement.classList.add('flash'); // Add flash effect
+		patternElement.classList.add('mdx_flash'); // Add flash effect
 		//element.style.opacity = 1; // Ensure full opacity
 
 		// After the flash animation completes, start the fade out
 		setTimeout(() => {
-			patternElement.classList.remove('flash'); // Remove flash effect
-			patternElement.classList.add('fade-out'); // Start fade out
+			patternElement.classList.remove('mdx_flash'); // Remove flash effect
+			patternElement.classList.add('mdx_fade-out'); // Start fade out
 		}, 2000); // Time to match the flash animation duration
 	}
 
@@ -552,9 +542,9 @@ class ModX extends Gamegui
 				x, y, lock: true
 			}, this, function() {} );
 		} else if (this.checkAction('moveWild', true)) {
-			const selected = document.querySelector('.selected');
+			const selected = document.querySelector('.mdx_selected');
 			if (selected !== null) { // There is a selected token
-				if (square.classList.contains('possibleMove')) {
+				if (square.classList.contains('mdx_possibleMove')) {
 					this.addTokenOutline(parseInt(x), parseInt(y));
 					let [_square_, old_x, old_y] = selected.closest('[id]')!.id.split('_');
 					this.ajaxcall( `/${this.game_name}/${this.game_name}/moveWild.html`, {
@@ -567,7 +557,7 @@ class ModX extends Gamegui
 				this.showMessage(_("Select a Wild to reposition it, or click 'Finish Turn'"), "error");
 			}
 		} else if (this.checkAction('placeWild')) {
-			if (square.classList.contains('possibleMove')) {
+			if (square.classList.contains('mdx_possibleMove')) {
 				this.addTokenOutline(parseInt(x), parseInt(y));
 				this.ajaxcall( `/${this.game_name}/${this.game_name}/placeWild.html`, {
 					x, y, lock: true
@@ -597,15 +587,15 @@ class ModX extends Gamegui
 			if (token === null) { // Check if there is already a token at this square's location
 				throw new Error("token was selected but was somehow null");
 			}
-			if (token.classList.contains('selectable')) {
-				if (token.classList.contains('selected')) { // deselect the token
-					token.classList.remove('selected');
+			if (token.classList.contains('mdx_selectable')) {
+				if (token.classList.contains('mdx_selected')) { // deselect the token
+					token.classList.remove('mdx_selected');
 				} else {
 					this.clearSelectedToken();
-					token.classList.add('selected'); // select a token and update possibleMoves
+					token.classList.add('mdx_selected'); // select a token and update possibleMoves
 					this.addTooltip(`token_${x}_${y}`, '', _('This Wild is currently selected'));
 					for (const wild_id in this.wildsPossibleMoves) {
-						if (token.classList.contains(`wild_${wild_id}`)) {
+						if (token.classList.contains(`mdx_wild_${wild_id}`)) {
 							const possibleMoves = this.wildsPossibleMoves[wild_id];
 							if (possibleMoves === undefined) {
 								throw new Error("when trying to get possible moves index was undefined");
@@ -679,10 +669,7 @@ class ModX extends Gamegui
 	//// Reaction to cometD notifications
 
 	/** @gameSpecific See {@link Gamegui.setupNotifications} for more information. */
-	override setupNotifications()
-	{
-		console.log( 'notifications subscriptions setup' );
-
+	override setupNotifications() {
 		dojo.subscribe( 'playToken', this, "notif_playToken" );
 		this.notifqueue.setSynchronous( 'playToken', 500 );
 		dojo.subscribe( 'moveWild', this, "notif_moveWild" );
@@ -722,7 +709,6 @@ class ModX extends Gamegui
 
 	notif_newScores( notif: NotifAs<'newScores'> )
 	{
-		console.log('newScores has been called');
 		for( var player_id in notif.args.scores )
 		{
 			let counter = this.scoreCtrl[ player_id ];
@@ -774,17 +760,15 @@ class ModX extends Gamegui
 	}
 
 	notif_pointsWin() {
-		console.log("Win by points!");
 	}
 
 	notif_blockadeWin() {
-		console.log("blockade win!");
 	}
 
 	notif_instantWin() {
 		this.clearSelectableFromAll();
-		document.querySelectorAll('.tokencolor_0').forEach((element, index) => {
-			element.classList.add('instant_win');
+		document.querySelectorAll('.mdx_tokencolor_0').forEach((element, index) => {
+			element.classList.add('mdx_instant_win');
 			const html_element = <HTMLElement>element;
 			html_element.style.animationDelay = `${index * 1}s`;
 		});

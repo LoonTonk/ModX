@@ -42,8 +42,8 @@ class view_modx_modx extends game_view
 
         /*********** Place your code below:  ************/
         // States that we should start inserting at the 'square' block
-        $this->page->begin_block( "modx_modx", "square" );
-        $this->page->begin_block("modx_modx", "coordinate_marker");
+        $this->page->begin_block( "modx_modx", "mdx_square" );
+        $this->page->begin_block("modx_modx", "mdx_coordinate_marker");
         $hor_scale = 64; // Constant for square width
         $ver_scale = 64; // Constant for square height
         $column_markers = ['8','7','6','5','4','3','2','1'];
@@ -53,21 +53,21 @@ class view_modx_modx extends game_view
             for( $y=1; $y<=8; $y++ ) // Loop the 8 rows..
             {
                 // Inserts the code found at the square block based on the variables.
-                $this->page->insert_block( "square", array(
+                $this->page->insert_block( "mdx_square", array(
                     'X' => $x,
                     'Y' => $y,
                     'LEFT' => round( ($x-1)*$hor_scale+6 ),
                     'TOP' => round( ($y-1)*$ver_scale+6 )
                 ) );
                 if ($x === 1) {
-                    $this->page->insert_block( "coordinate_marker", array(
+                    $this->page->insert_block( "mdx_coordinate_marker", array(
                         'coordinate' => $column_markers[$y-1],
                         'LEFT' => round( ($x-1)*$hor_scale-15 ),
                         'TOP' => round( ($y-1)*$ver_scale+20 )
                     ));
                 }
                 if ($y === 8) {
-                    $this->page->insert_block( "coordinate_marker", array(
+                    $this->page->insert_block( "mdx_coordinate_marker", array(
                         'coordinate' => $row_markers[$x-1],
                         'LEFT' => round( ($x-1)*$hor_scale+30 ),
                         'TOP' => round( ($y-1)*$ver_scale+75 )

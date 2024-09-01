@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"], function (require, exports, Gamegui) {
+define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "dojo/ready", "ebg/counter"], function (require, exports, Gamegui, ready) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ModX = (function (_super) {
@@ -22,11 +22,10 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             var _this = _super.call(this) || this;
             _this.wildsPossibleMoves = [];
             _this.remainingTokensCounter = [];
-            console.log('modx constructor');
             return _this;
         }
         ModX.prototype.setup = function (gamedatas) {
-            console.log("Starting game setup");
+            var _this = this;
             for (var player_id in gamedatas.players) {
                 var player = gamedatas.players[player_id];
                 if (player === undefined) {
@@ -50,32 +49,30 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                 counter.create('remainingTokens_' + player_id);
                 var tokensLeft = gamedatas.tokensLeft[parseInt(player_id)];
                 if (tokensLeft === undefined) {
-                    console.log("tokensLeft is undefined, player id is: ");
-                    console.log(player_id);
                     throw new Error();
                 }
                 counter.setValue(parseInt(tokensLeft));
                 this.remainingTokensCounter[player_id] = counter;
                 this.addTooltip("playertoken_".concat(player_id), _('X-pieces remaining'), '');
             }
-            for (var i in gamedatas.board) {
-                var square = gamedatas.board[i];
-                if (square !== undefined && square.player != -1) {
-                    this.addTokenOnBoard(square.x, square.y, square.player, square.selectable == 1);
+            ready(function () {
+                for (var i in gamedatas.board) {
+                    var square = gamedatas.board[i];
+                    if (square !== undefined && square.player != -1) {
+                        _this.addTokenOnBoard(square.x, square.y, square.player, square.selectable == 1);
+                    }
+                    if (square !== undefined && square.player_tile != -1) {
+                        _this.addTileOnBoard(square.x, square.y, square.player_tile);
+                    }
+                    if (square !== undefined && square.lastPlayed > 1) {
+                        _this.addLastPlayedToBoard(square.x, square.y, square.lastPlayed);
+                    }
                 }
-                if (square !== undefined && square.player_tile != -1) {
-                    this.addTileOnBoard(square.x, square.y, square.player_tile);
-                }
-                if (square !== undefined && square.lastPlayed > 1) {
-                    this.addLastPlayedToBoard(square.x, square.y, square.lastPlayed);
-                }
-            }
-            dojo.query('.square').connect('onclick', this, 'onsquareClick');
+                dojo.query('.mdx_square').connect('onclick', _this, 'onsquareClick');
+            });
             this.setupNotifications();
-            console.log("Ending game setup");
         };
         ModX.prototype.onEnteringState = function (stateName, args) {
-            console.log('Entering state: ' + stateName);
             switch (stateName) {
                 case 'wildPlacement':
                     this.updatePossibleMoves(args.args.possibleMoves, 'wildPlacement');
@@ -99,7 +96,6 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             }
         };
         ModX.prototype.onUpdateActionButtons = function (stateName, args) {
-            console.log('onUpdateActionButtons: ' + stateName, args);
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case 'repositionWilds':
@@ -108,18 +104,18 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             }
         };
         ModX.prototype.clearPatterns = function () {
-            document.querySelectorAll('.pattern').forEach(function (element) {
+            document.querySelectorAll('.mdx_pattern').forEach(function (element) {
                 dojo.destroy(element);
             });
         };
         ModX.prototype.clearSelectedToken = function () {
-            document.querySelectorAll('.selected').forEach(function (element) {
-                element.classList.remove('selected');
+            document.querySelectorAll('.mdx_selected').forEach(function (element) {
+                element.classList.remove('mdx_selected');
             });
         };
         ModX.prototype.clearSelectableFromAll = function () {
             var _this = this;
-            document.querySelectorAll('.selectable').forEach(function (element) {
+            document.querySelectorAll('.mdx_selectable').forEach(function (element) {
                 var _a = element.id.split('_'), _token_ = _a[0], x = _a[1], y = _a[2];
                 if (x === undefined || y === undefined) {
                     throw new Error("When trying to get x and y from id of selectable token it was undefined");
@@ -129,25 +125,25 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
         };
         ModX.prototype.removeSelectable = function (x, y) {
             var selectable_token = $("token_".concat(x, "_").concat(y));
-            selectable_token === null || selectable_token === void 0 ? void 0 : selectable_token.classList.remove('selectable');
-            selectable_token === null || selectable_token === void 0 ? void 0 : selectable_token.classList.remove('selected');
+            selectable_token === null || selectable_token === void 0 ? void 0 : selectable_token.classList.remove('mdx_selectable');
+            selectable_token === null || selectable_token === void 0 ? void 0 : selectable_token.classList.remove('mdx_selected');
             this.addTooltip("token_".concat(x, "_").concat(y), _('This is a Wild X-piece'), '');
         };
         ModX.prototype.clearPossibleMoves = function () {
             var _this = this;
-            document.querySelectorAll('.possibleMove').forEach(function (element) {
+            document.querySelectorAll('.mdx_possibleMove').forEach(function (element) {
                 _this.removeTooltip(element.id);
-                element.classList.remove('possibleMove');
+                element.classList.remove('mdx_possibleMove');
             });
         };
         ModX.prototype.clearLastPlayed = function () {
-            document.querySelectorAll('.lastPlayed').forEach(function (element) {
+            document.querySelectorAll('.mdx_lastPlayed').forEach(function (element) {
                 dojo.destroy(element);
             });
         };
         ModX.prototype.addLastPlayedToBoard = function (x, y, lastPlayed) {
             var color = this.gamedatas.players[lastPlayed].color;
-            document.querySelectorAll(".lastPlayedcolor_".concat(color)).forEach(function (element) {
+            document.querySelectorAll(".mdx_lastPlayedcolor_".concat(color)).forEach(function (element) {
                 dojo.destroy(element);
             });
             dojo.place(this.format_block('jstpl_lastPlayed', {
@@ -168,7 +164,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             this.placeOnObject("token_outline_".concat(x, "_").concat(y), "square_".concat(x, "_").concat(y));
         };
         ModX.prototype.clearTokenOutline = function () {
-            document.querySelectorAll('.token_outline').forEach(function (element) {
+            document.querySelectorAll('.mdx_token_outline').forEach(function (element) {
                 dojo.destroy(element);
             });
         };
@@ -177,7 +173,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             if (selectable_token === null) {
                 throw new Error("when trying to get selectable token it was null");
             }
-            selectable_token.classList.add('selectable');
+            selectable_token.classList.add('mdx_selectable');
             this.addTooltip("token_".concat(x, "_").concat(y), '', _('Select this Wild to reposition it'));
         };
         ModX.prototype.updatePossibleMoves = function (possibleMoves, gameState) {
@@ -187,18 +183,18 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                     var square = $("square_".concat(x, "_").concat(y));
                     if (!square)
                         throw new Error("Unknown square element: ".concat(x, "_").concat(y, ". Make sure the board grid was set up correctly in the tpl file."));
-                    square.classList.add('possibleMove');
+                    square.classList.add('mdx_possibleMove');
                 }
             }
             switch (gameState) {
                 case ('wildPlacement'):
-                    this.addTooltipToClass('possibleMove', '', _('Place a Wild here'));
+                    this.addTooltipToClass('mdx_possibleMove', '', _('Place a Wild here'));
                     break;
                 case ('playerTurn'):
-                    this.addTooltipToClass('possibleMove', '', _('Place your X-piece here'));
+                    this.addTooltipToClass('mdx_possibleMove', '', _('Place your X-piece here'));
                     break;
                 case ('moveWild'):
-                    this.addTooltipToClass('possibleMove', '', _('Move the selected Wild here'));
+                    this.addTooltipToClass('mdx_possibleMove', '', _('Move the selected Wild here'));
                     break;
                 case ('repositionWild'):
                     break;
@@ -213,10 +209,10 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                     color: 0,
                     x_y: "".concat(x, "_").concat(y)
                 }), 'board');
-                (_a = $("token_".concat(x, "_").concat(y))) === null || _a === void 0 ? void 0 : _a.classList.add("wild_".concat(player_id));
-                console.log(document.getElementById("token_".concat(x, "_").concat(y)));
-                console.log("square_".concat(x, "_").concat(y));
-                player_id = this.getCurrentPlayerId();
+                (_a = $("token_".concat(x, "_").concat(y))) === null || _a === void 0 ? void 0 : _a.classList.add("mdx_wild_".concat(player_id));
+                if (!this.isSpectator) {
+                    player_id = this.getCurrentPlayerId();
+                }
                 this.addTooltip("token_".concat(x, "_").concat(y), _('This is a Wild X-piece'), '');
             }
             else {
@@ -237,8 +233,13 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             if (selectable) {
                 this.markSelectableToken(x, y);
             }
-            this.placeOnObject("token_".concat(x, "_").concat(y), "overall_player_board_".concat(player_id));
-            this.slideToObject("token_".concat(x, "_").concat(y), "square_".concat(x, "_").concat(y)).play();
+            if (player_id > ModX.MAX_WILDS) {
+                this.placeOnObject("token_".concat(x, "_").concat(y), "overall_player_board_".concat(player_id));
+                this.slideToObject("token_".concat(x, "_").concat(y), "square_".concat(x, "_").concat(y)).play();
+            }
+            else {
+                this.placeOnObject("token_".concat(x, "_").concat(y), "square_".concat(x, "_").concat(y));
+            }
         };
         ModX.prototype.addTileOnBoard = function (x, y, player_id) {
             var player = this.gamedatas.players[player_id];
@@ -247,7 +248,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             }
             var scoretile = $("scoretile_".concat(x, "_").concat(y));
             if (scoretile !== null) {
-                scoretile.classList.add('toDestroy');
+                scoretile.classList.add('mdx_toDestroy');
                 scoretile.id += '_toDestroy';
             }
             dojo.place(this.format_block('jstpl_scoretile', {
@@ -257,7 +258,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             this.placeOnObject("scoretile_".concat(x, "_").concat(y), "overall_player_board_".concat(player_id));
             var animation_id = this.slideToObject("scoretile_".concat(x, "_").concat(y), "square_".concat(x, "_").concat(y));
             dojo.connect(animation_id, 'onEnd', function () {
-                document.querySelectorAll('.toDestroy').forEach(function (element) {
+                document.querySelectorAll('.mdx_toDestroy').forEach(function (element) {
                     dojo.destroy(element);
                 });
                 var curr_scoretile = $("scoretile_".concat(x, "_").concat(y));
@@ -270,7 +271,6 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             animation_id.play();
         };
         ModX.prototype.addPatternOnBoard = function (pattern, x, y, player_id) {
-            console.log("Adding pattern at position (".concat(x, ", ").concat(y, "):"), pattern);
             var player = this.gamedatas.players[parseInt(player_id)];
             if (!player) {
                 throw new Error('Unknown player id: ' + player_id);
@@ -297,8 +297,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                             x_pos += -2;
                             break;
                         default:
-                            console.log("row pattern code does not match");
-                            return;
+                            throw new Error("row pattern code does not match");
                     }
                     break;
                 case ('col'):
@@ -319,8 +318,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                             y_pos += -2;
                             break;
                         default:
-                            console.log("col pattern code does not match");
-                            return;
+                            throw new Error("col pattern code does not match");
                     }
                     break;
                 case ('nwd'):
@@ -346,8 +344,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                             y_pos += -2;
                             break;
                         default:
-                            console.log("nwd pattern code does not match");
-                            return;
+                            throw new Error("nwd pattern code does not match");
                     }
                     break;
                 case ('ned'):
@@ -373,8 +370,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                             y_pos += -2;
                             break;
                         default:
-                            console.log("ned pattern code does not match");
-                            return;
+                            throw new Error("ned pattern code does not match");
                     }
                     break;
                 case ('pls'):
@@ -400,8 +396,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                             y_pos += -1;
                             break;
                         default:
-                            console.log("pls pattern code does not match");
-                            return;
+                            throw new Error("pls pattern code does not match");
                     }
                     break;
                 case ('crs'):
@@ -427,13 +422,11 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                             y_pos += -1;
                             break;
                         default:
-                            console.log("crs pattern code does not match");
-                            return;
+                            throw new Error("crs pattern code does not match");
                     }
                     break;
                 default:
-                    console.log("pattern code does not match");
-                    return;
+                    throw new Error("pattern code does not match");
             }
             dojo.place(this.format_block('jstpl_pattern', {
                 color: player.color,
@@ -442,10 +435,10 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             }), "board");
             var patternElement = $("pattern_".concat(x_pos, "_").concat(y_pos, "_").concat(patternType));
             this.placeOnObject(patternElement, "square_".concat(x_pos, "_").concat(y_pos));
-            patternElement.classList.add('flash');
+            patternElement.classList.add('mdx_flash');
             setTimeout(function () {
-                patternElement.classList.remove('flash');
-                patternElement.classList.add('fade-out');
+                patternElement.classList.remove('mdx_flash');
+                patternElement.classList.add('mdx_fade-out');
             }, 2000);
         };
         ModX.prototype.isWild = function (id) {
@@ -477,9 +470,9 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                 }, this, function () { });
             }
             else if (this.checkAction('moveWild', true)) {
-                var selected = document.querySelector('.selected');
+                var selected = document.querySelector('.mdx_selected');
                 if (selected !== null) {
-                    if (square.classList.contains('possibleMove')) {
+                    if (square.classList.contains('mdx_possibleMove')) {
                         this.addTokenOutline(parseInt(x), parseInt(y));
                         var _b = selected.closest('[id]').id.split('_'), _square_1 = _b[0], old_x = _b[1], old_y = _b[2];
                         this.ajaxcall("/".concat(this.game_name, "/").concat(this.game_name, "/moveWild.html"), {
@@ -495,7 +488,7 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                 }
             }
             else if (this.checkAction('placeWild')) {
-                if (square.classList.contains('possibleMove')) {
+                if (square.classList.contains('mdx_possibleMove')) {
                     this.addTokenOutline(parseInt(x), parseInt(y));
                     this.ajaxcall("/".concat(this.game_name, "/").concat(this.game_name, "/placeWild.html"), {
                         x: x,
@@ -522,16 +515,16 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
                 if (token === null) {
                     throw new Error("token was selected but was somehow null");
                 }
-                if (token.classList.contains('selectable')) {
-                    if (token.classList.contains('selected')) {
-                        token.classList.remove('selected');
+                if (token.classList.contains('mdx_selectable')) {
+                    if (token.classList.contains('mdx_selected')) {
+                        token.classList.remove('mdx_selected');
                     }
                     else {
                         this.clearSelectedToken();
-                        token.classList.add('selected');
+                        token.classList.add('mdx_selected');
                         this.addTooltip("token_".concat(x, "_").concat(y), '', _('This Wild is currently selected'));
                         for (var wild_id in this.wildsPossibleMoves) {
-                            if (token.classList.contains("wild_".concat(wild_id))) {
+                            if (token.classList.contains("mdx_wild_".concat(wild_id))) {
                                 var possibleMoves = this.wildsPossibleMoves[wild_id];
                                 if (possibleMoves === undefined) {
                                     throw new Error("when trying to get possible moves index was undefined");
@@ -556,7 +549,6 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             }
         };
         ModX.prototype.setupNotifications = function () {
-            console.log('notifications subscriptions setup');
             dojo.subscribe('playToken', this, "notif_playToken");
             this.notifqueue.setSynchronous('playToken', 500);
             dojo.subscribe('moveWild', this, "notif_moveWild");
@@ -587,7 +579,6 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             }
         };
         ModX.prototype.notif_newScores = function (notif) {
-            console.log('newScores has been called');
             for (var player_id in notif.args.scores) {
                 var counter = this.scoreCtrl[player_id];
                 var newScore = notif.args.scores[player_id];
@@ -630,15 +621,13 @@ define("bgagame/modx", ["require", "exports", "ebg/core/gamegui", "ebg/counter"]
             this.addPatternOnBoard(notif.args.patternCode, notif.args.x, notif.args.y, notif.args.player_id);
         };
         ModX.prototype.notif_pointsWin = function () {
-            console.log("Win by points!");
         };
         ModX.prototype.notif_blockadeWin = function () {
-            console.log("blockade win!");
         };
         ModX.prototype.notif_instantWin = function () {
             this.clearSelectableFromAll();
-            document.querySelectorAll('.tokencolor_0').forEach(function (element, index) {
-                element.classList.add('instant_win');
+            document.querySelectorAll('.mdx_tokencolor_0').forEach(function (element, index) {
+                element.classList.add('mdx_instant_win');
                 var html_element = element;
                 html_element.style.animationDelay = "".concat(index * 1, "s");
             });

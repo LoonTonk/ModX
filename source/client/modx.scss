@@ -8,8 +8,7 @@
  * -----
  */
 
-// TODO: add trigram to all the classes to avoid namespace conflict
-#mdx_board {
+#board {
     // Setup Image
     width: 522px;
     height: 522px;
@@ -20,11 +19,11 @@
     // Tokens and squares are absolutely placed relative to the board
     position: relative;
 }
-.show_notation #board {
+.mdx_show_notation #board {
 	margin-bottom: 40px; 
 }
 
-.coordinate_marker {
+.mdx_coordinate_marker {
 	width: auto;
 	height: auto;
 	position: absolute;
@@ -33,11 +32,11 @@
 	font-size: 16pt;
 }
 
-.hide_notation .coordinate_marker {
+.mdx_hide_notation .mdx_coordinate_marker {
 	display: none;
 }
 
-.square {
+.mdx_square {
     // Size of a square
     width: 62px;
     height: 62px;
@@ -46,7 +45,7 @@
     // Placeholder for validating the positions.
 	z-index: 0;
 }
-.scoretile {  
+.mdx_scoretile {  
 	top: 0px;
 	left: 0px;
  	width: 62px;
@@ -55,24 +54,24 @@
 	z-index: 1; 
 	pointer-events: none;
 }
-.tilecolor_009bd2 { background-color: #0077a3;
+.mdx_tilecolor_009bd2 { background-color: #0077a3;
 }
-.tilecolor_e53f2c { background-color:#b23223;
+.mdx_tilecolor_e53f2c { background-color:#b23223;
  }
-.tilecolor_050303 { background-color: #414141;
+.mdx_tilecolor_050303 { background-color: #414141;
  }
-.tilecolor_ffc750 { background-color: #d9a03e;
+.mdx_tilecolor_ffc750 { background-color: #d9a03e;
  }
 
-.token {
+.mdx_token {
 	width: 56px;
 	height: 56px; 
 	position: absolute; 
 	z-index: 4; 
 	background-image: url('img/modx_tokens.png');
-	transform: scale(0.9);
+	transform: scale(0.8);
 }
-.tokencolor_0 {
+.mdx_tokencolor_0 {
 	background-position: 0px 0px;
 	animation: pulse 1s ease-in-out infinite alternate-reverse;
   }
@@ -85,7 +84,7 @@
 	}
   }
 
-.instant_win { animation: instant_win_animation 2s ease-in-out infinite; }
+.mdx_instant_win { animation: instant_win_animation 2s ease-in-out infinite; }
 @keyframes instant_win_animation {
     0% {
         transform: rotate(0deg) scale(1);
@@ -98,17 +97,17 @@
     }
 }
 
-.tokencolor_009bd2 { background-position: -56px 0px; } // Blue token
-.tokencolor_e53f2c { background-position: -112px 0px; } // Red token
-.tokencolor_050303 { background-position: -168px 0px; } // Green token
-.tokencolor_ffc750 { background-position: -224px 0px; } // Yellow token
-.token_outline { background-position: -280px 0px; z-index: 3; }
+.mdx_tokencolor_009bd2 { background-position: -56px 0px; } // Blue token
+.mdx_tokencolor_e53f2c { background-position: -112px 0px; } // Red token
+.mdx_tokencolor_050303 { background-position: -168px 0px; } // Green token
+.mdx_tokencolor_ffc750 { background-position: -224px 0px; } // Yellow token
+.mdx_token_outline { background-position: -280px 0px; z-index: 3; }
 
-.hide_lastPlayed .lastPlayed {
+.mdx_hide_lastPlayed .mdx_lastPlayed {
 	display: none;
 }
 
-.lastPlayed {
+.mdx_lastPlayed {
 	pointer-events: none;
 	width: 45px;
 	height: 45px;
@@ -116,12 +115,12 @@
 	position: absolute;
 	background-image: url('img/modx_last_played.png');
 }
-.lastPlayedcolor_009bd2 { background-position: 0px 0px; } // Blue lastPlayed
-.lastPlayedcolor_e53f2c { background-position: -45px 0px; } // Red lastPlayed
-.lastPlayedcolor_050303 { background-position: -90px 0px; } // Green lastPlayed
-.lastPlayedcolor_ffc750 { background-position: -135px 0px; } // Yellow lastPlayed
+.mdx_lastPlayedcolor_009bd2 { background-position: 0px 0px; } // Blue lastPlayed
+.mdx_lastPlayedcolor_e53f2c { background-position: -45px 0px; } // Red lastPlayed
+.mdx_lastPlayedcolor_050303 { background-position: -90px 0px; } // Green lastPlayed
+.mdx_lastPlayedcolor_ffc750 { background-position: -135px 0px; } // Yellow lastPlayed
 
-.selectable.tokencolor_0 {
+.mdx_selectable.mdx_tokencolor_0 {
 	animation: selectable-token-animation 1s ease-in-out infinite alternate-reverse;
 	z-index: 5;
 }
@@ -134,11 +133,11 @@
 		opacity: .8
 	}
 }
-.tokencolor_0.selectable.selected {
+.mdx_tokencolor_0.mdx_selectable.mdx_selected {
 	animation: none;
 	background-image: none;
 }
-.selected::before {
+.mdx_selected::before {
 	content: '';
 	background-image: url('img/modx_selected_wild.png');
 	content: "";
@@ -150,7 +149,7 @@
 	transform: translate(-50%, -50%) ;
 }
 
-.pattern {
+.mdx_pattern {
 	position: absolute;
 	background-image: url('img/modx_patterns.png');
 	z-index: 2;
@@ -159,29 +158,29 @@
 	background-position: var(--x-pos, 0px) var(--y-pos, 0px);
 	transition: opacity 1s ease-in-out;
 }
-.patterncolor_009bd2 { --y-pos: 0px; }
-.patterncolor_e53f2c { --y-pos: -330px; }
-.patterncolor_050303 { --y-pos: -660px; }
-.patterncolor_ffc750 { --y-pos: -990px; }
-.patterntype_row, .patterntype_col {
+.mdx_patterncolor_009bd2 { --y-pos: 0px; }
+.mdx_patterncolor_e53f2c { --y-pos: -330px; }
+.mdx_patterncolor_050303 { --y-pos: -660px; }
+.mdx_patterncolor_ffc750 { --y-pos: -990px; }
+.mdx_patterntype_row, .mdx_patterntype_col {
 	height: 330px;
 	width: 74px;
 }
-.patterntype_row, .patterntype_ned { // Rows and ne-sw diagonal are just rotated version of cols and nw-se diagonal
+.mdx_patterntype_row, .mdx_patterntype_ned { // Rows and ne-sw diagonal are just rotated version of cols and nw-se diagonal
 	transform: rotate(90deg);
 }
-.patterntype_pls, .patterntype_crs {
+.mdx_patterntype_pls, .mdx_patterntype_crs {
 	height: 202px;
 	width: 202px;
 }
-.patterntype_crs { --x-pos: -74px; }
-.patterntype_pls { --x-pos: -276px; }
-.patterntype_nwd, .patterntype_ned {
+.mdx_patterntype_crs { --x-pos: -74px; }
+.mdx_patterntype_pls { --x-pos: -276px; }
+.mdx_patterntype_nwd, .mdx_patterntype_ned {
 	--x-pos: -478px;
 	height: 330px;
 	width: 330px;
 }
-.flash {
+.mdx_flash {
     animation: flash 2s ease-in-out;
 }
 @keyframes flash {
@@ -194,15 +193,15 @@
     100% { opacity: 0.5; }
 }
 
-.fade-out {
+.mdx_fade-out {
     animation: fadeOut 2s forwards;
 }
 
-.possibleMove {
+.mdx_possibleMove {
     background-color: rgb(255, 255, 255);
     cursor: pointer;
 }
-.square.possibleMove::before {
+.mdx_square.mdx_possibleMove::before {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -215,41 +214,41 @@
 	transition: opacity 0.3s ease;
 	z-index: 10; /* Ensure it's on top */
   }
-.square.possibleMove:hover::before {
+.mdx_square.mdx_possibleMove:hover::before {
 	opacity: 1; /* Show on hover */
 }
 
-.playertokens {
+.mdx_playertokens {
 	display: flex;
     justify-content: flex-start; /* or other values like center, space-around, etc. */
     align-items: center; /* Aligns items vertically */
 	margin-right: 20px;
   }
-.displayToken {
+.mdx_displayToken {
 	position: relative;
 	scale: 0.8;
 }
-.counter {
+.mdx_counter {
 	font-size: 24pt;
 }
-.player_board {
+.mdx_player_board {
 	display: flex;
     justify-content: flex-start; /* or other values like center, space-around, etc. */
     align-items: center; /* Aligns items vertically */
 }
-.team {
+.mdx_team {
 	width: 30px;
 	height: 50px;
 	background-image: url('img/modx_team_icons.png');
 }
 
-.team_0 { // teams not enabled
+.mdx_team_0 { // teams not enabled
 	display: none;
 }
-.team_1 {
+.mdx_team_1 {
 	background-position: 0px 0px;
 }
-.team_2 {
+.mdx_team_2 {
 	background-position: 30px 0px;
 }
 /*

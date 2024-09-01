@@ -18,12 +18,12 @@
         "values": {
             "1": {
                 "name": "Enabled",
-                "cssPref": "show_lastPlayed"
+                "cssPref": "mdx_show_lastPlayed"
             },
             "2": {
                 "name": "Disabled",
                 // Then this is added to the page, we will override the image urls in the css.
-                "cssPref": "hide_lastPlayed"
+                "cssPref": "mdx_hide_lastPlayed"
             }
         },
         "default": 2
@@ -34,12 +34,12 @@
         "values": {
             "1": {
                 "name": "Enabled",
-                "cssPref": "show_notation"
+                "cssPref": "mdx_show_notation"
             },
             "2": {
                 "name": "Disabled",
                 // Then this is added to the page, we will override the image urls in the css.
-                "cssPref": "hide_notation"
+                "cssPref": "mdx_hide_notation"
             }
         },
         "default": 1
