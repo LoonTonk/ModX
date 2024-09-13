@@ -760,18 +760,18 @@ class ModX extends Table
                     $player_score = (int)$player_score_count['score'];
                     if ($player_score > $highest_score) { // If score is higher than previous highest, clear highest score players and add self to it
                         array_splice($highest_score_players, 0);
-                        $highest_score_players[] = $this->getPlayerNameById((int)$player_score_count['player']);
+                        $highest_score_players[] = (int)$player_score_count['player'];
                         $highest_score = $player_score;
                     } else if ($player_score === $highest_score) { // If score is equal, add player to highest score players
-                        $highest_score_players[] = $this->getPlayerNameById((int)$player_score_count['player']);
+                        $highest_score_players[] = (int)$player_score_count['player'];
                     } // Otherwise, do nothing
                 }   
 
-                $winning_players = $highest_score_players[0];
+                $winning_players = $this->getPlayerNameById($highest_score_players[0]);
                 if (count($highest_score_players) > 1) {
                     $other_highest_score_players = array_diff($highest_score_players, [$highest_score_players[0]]);
-                    foreach ($other_highest_score_players as $player_name) {
-                        $winning_players .= ', '.$player_name;
+                    foreach ($other_highest_score_players as $player_id) {
+                        $winning_players .= ', '. $this->getPlayerNameById($player_id);
                     }
                 }
                 self::setStat(1, 'victory_type');
@@ -875,7 +875,7 @@ class ModX extends Table
         self::incStat(1, 'wilds_moved', $curr_player);
         $points_to_win = ($this->getGameStateValue('ffa_or_teams') == 2) ? self::POINTS_TO_WIN['2v2'] : self::POINTS_TO_WIN[$this->getPlayersNumber()];
         $wild_pattern = self::checkWildPatternExists($new_x, $new_y, self::getBoard());
-        if (count($wild_pattern) > 0) { // A player has achieved a pattern of 5 wilds
+        if (count($wild_pattern) > 0) { // A player has achieved an instant win
             $curr_player = $this->getActivePlayerId();
             if ($this->getGameStateValue('ffa_or_teams') == 2) { // Teammate should also get points because they should also win
                 $player_team = self::getUniqueValueFromDb( "SELECT player_team FROM player WHERE player_id = $curr_player");
@@ -883,6 +883,8 @@ class ModX extends Table
             } else {
                 self:: DbQuery( "UPDATE player SET player_score = $points_to_win WHERE (player_id) IN ('$curr_player')"); // Give player winning number of points
             }
+            // Remove selectable from wilds
+            self::DbQuery("UPDATE board SET board_selectable = 0 WHERE board_selectable IN (1)");
             // Notify update scores
             $newScores = self::getCollectionFromDb( "SELECT player_id, player_score FROM player", true );
             self::setStat(2, 'victory_type');
